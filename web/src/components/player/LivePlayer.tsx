@@ -92,6 +92,25 @@ export default function LivePlayer({
   const liveReadyRef = useRef(liveReady);
   const cameraActiveRef = useRef(cameraActive);
 
+  // Hack to mitigate browser not allowing audio to autoplay
+  // Reloads the audio on browser interaction
+  // YouTube doesn't have to do this bullshit because it's whitelisted :^)
+  const [didTryAudioReset, setDidTryAudioReset] = useState(false);
+  useEffect(() => {
+    const listener = () => {
+      if (!didTryAudioReset) {
+        const v = localAudio;
+        setLocalAudio(!v);
+        setTimeout(() => setLocalAudio(v), 1);
+        setDidTryAudioReset(true);
+      }
+    };
+
+    document.addEventListener("mousedown", listener);
+
+    return () => document.removeEventListener("mousedown", listener);
+  }, []);
+
   useEffect(() => {
     liveReadyRef.current = liveReady;
     cameraActiveRef.current = cameraActive;
