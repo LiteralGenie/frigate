@@ -1,24 +1,26 @@
-import WebRtcPlayer from "./WebRTCPlayer";
-import { CameraConfig } from "@/types/frigateConfig";
-import AutoUpdatingCameraImage from "../camera/AutoUpdatingCameraImage";
-import ActivityIndicator from "../indicators/activity-indicator";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import MSEPlayer from "./MsePlayer";
-import JSMpegPlayer from "./JSMpegPlayer";
-import { MdCircle } from "react-icons/md";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useCameraActivity } from "@/hooks/use-camera-activity";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { cn } from "@/lib/utils";
+import { CameraConfig } from "@/types/frigateConfig";
 import {
   LivePlayerError,
   LivePlayerMode,
   VideoResolutionType,
 } from "@/types/live";
 import { getIconForLabel } from "@/utils/iconUtil";
-import Chip from "../indicators/Chip";
 import { capitalizeFirstLetter } from "@/utils/stringUtil";
-import { cn } from "@/lib/utils";
-import { TbExclamationCircle } from "react-icons/tb";
 import { TooltipPortal } from "@radix-ui/react-tooltip";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { GiSpeaker, GiSpeakerOff } from "react-icons/gi";
+import { TbExclamationCircle } from "react-icons/tb";
+import AutoUpdatingCameraImage from "../camera/AutoUpdatingCameraImage";
+import CameraFeatureToggle from "../dynamic/CameraFeatureToggle";
+import ActivityIndicator from "../indicators/activity-indicator";
+import Chip from "../indicators/Chip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import JSMpegPlayer from "./JSMpegPlayer";
+import MSEPlayer from "./MsePlayer";
+import WebRtcPlayer from "./WebRTCPlayer";
 
 type LivePlayerProps = {
   cameraRef?: (ref: HTMLDivElement | null) => void;
@@ -33,6 +35,7 @@ type LivePlayerProps = {
   iOSCompatFullScreen?: boolean;
   pip?: boolean;
   autoLive?: boolean;
+  overrideLocalAudio?: boolean;
   onClick?: () => void;
   setFullResolution?: React.Dispatch<React.SetStateAction<VideoResolutionType>>;
   onError?: (error: LivePlayerError) => void;
@@ -47,11 +50,12 @@ export default function LivePlayer({
   preferredLiveMode,
   showStillWithoutActivity = true,
   windowVisible = true,
-  playAudio = false,
+  playAudio = true,
   micEnabled = false,
   iOSCompatFullScreen = false,
   pip,
   autoLive = true,
+  overrideLocalAudio = false,
   onClick,
   setFullResolution,
   onError,
@@ -63,12 +67,23 @@ export default function LivePlayer({
   const { activeMotion, activeTracking, objects, offline } =
     useCameraActivity(cameraConfig);
 
-  const cameraActive = useMemo(
-    () =>
-      !showStillWithoutActivity ||
-      (windowVisible && (activeMotion || activeTracking)),
-    [activeMotion, activeTracking, showStillWithoutActivity, windowVisible],
+  const [localAudio, setLocalAudio] = useLocalStorage(
+    `${cameraConfig.name}_audio`,
+    playAudio,
   );
+
+  const audio = useMemo(
+    () => (overrideLocalAudio ? playAudio : localAudio),
+    [overrideLocalAudio, playAudio, localAudio],
+  );
+
+  // const cameraActive = useMemo(
+  //   () =>
+  //     !showStillWithoutActivity ||
+  //     (windowVisible && (activeMotion || activeTracking)),
+  //   [activeMotion, activeTracking, showStillWithoutActivity, windowVisible],
+  // );
+  const cameraActive = true;
 
   // camera live state
 
@@ -159,7 +174,7 @@ export default function LivePlayer({
         className={`size-full rounded-lg md:rounded-2xl ${liveReady ? "" : "hidden"}`}
         camera={cameraConfig.live.stream_name}
         playbackEnabled={cameraActive || liveReady}
-        audioEnabled={playAudio}
+        audioEnabled={audio}
         microphoneEnabled={micEnabled}
         iOSCompatFullScreen={iOSCompatFullScreen}
         onPlaying={playerIsPlaying}
@@ -174,7 +189,7 @@ export default function LivePlayer({
           className={`size-full rounded-lg md:rounded-2xl ${liveReady ? "" : "hidden"}`}
           camera={cameraConfig.live.stream_name}
           playbackEnabled={cameraActive || liveReady}
-          audioEnabled={playAudio}
+          audioEnabled={audio}
           onPlaying={playerIsPlaying}
           pip={pip}
           setFullResolution={setFullResolution}
@@ -305,12 +320,20 @@ export default function LivePlayer({
       )}
 
       <div className="absolute right-2 top-2">
-        {autoLive &&
-          !offline &&
-          activeMotion &&
-          ((showStillWithoutActivity && !liveReady) || liveReady) && (
-            <MdCircle className="mr-2 size-2 animate-pulse text-danger shadow-danger drop-shadow-md" />
-          )}
+        {!overrideLocalAudio && (
+          <CameraFeatureToggle
+            className="p-2 md:p-0"
+            variant="ghost"
+            Icon={audio ? GiSpeaker : GiSpeakerOff}
+            isActive={audio ?? false}
+            title={`${audio ? "Disable" : "Enable"} Camera Audio`}
+            onClick={(ev) => {
+              console.log(ev);
+              ev?.stopPropagation();
+              setLocalAudio(!audio);
+            }}
+          />
+        )}
         {offline && showStillWithoutActivity && (
           <Chip
             className={`z-0 flex items-start justify-between space-x-1 bg-gray-500 bg-gradient-to-br from-gray-400 to-gray-500 text-xs capitalize`}

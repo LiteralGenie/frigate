@@ -20,6 +20,8 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResizeObserver } from "@/hooks/resize-observer";
 import useKeyboardListener from "@/hooks/use-keyboard-listener";
+import { useSessionPersistence } from "@/hooks/use-session-persistence";
+import { cn } from "@/lib/utils";
 import { CameraConfig, FrigateConfig } from "@/types/frigateConfig";
 import {
   LivePlayerError,
@@ -56,7 +58,6 @@ import {
   FaMicrophoneSlash,
 } from "react-icons/fa";
 import { GiSpeaker, GiSpeakerOff } from "react-icons/gi";
-import { TbViewfinder, TbViewfinderOff } from "react-icons/tb";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import {
   LuEar,
@@ -74,11 +75,10 @@ import {
   MdZoomIn,
   MdZoomOut,
 } from "react-icons/md";
+import { TbViewfinder, TbViewfinderOff } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import useSWR from "swr";
-import { cn } from "@/lib/utils";
-import { useSessionPersistence } from "@/hooks/use-session-persistence";
 
 type LiveCameraViewProps = {
   config?: FrigateConfig;
@@ -197,7 +197,7 @@ export default function LiveCameraView({
 
   // playback state
 
-  const [audio, setAudio] = useSessionPersistence("liveAudio", false);
+  const [audio, setAudio] = useSessionPersistence("liveAudio", true);
   const [mic, setMic] = useState(false);
   const [webRTC, setWebRTC] = useState(false);
   const [pip, setPip] = useState(false);
@@ -470,6 +470,7 @@ export default function LiveCameraView({
                 preferredLiveMode={preferredLiveMode}
                 pip={pip}
                 containerRef={containerRef}
+                overrideLocalAudio={true}
                 setFullResolution={setFullResolution}
                 onError={handleError}
               />

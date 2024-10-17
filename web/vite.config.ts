@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
+import react from "@vitejs/plugin-react-swc";
 import path, { resolve } from "path";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
 import monacoEditorPlugin from "vite-plugin-monaco-editor";
 
 const proxyHost = process.env.PROXY_HOST || "localhost:5000";

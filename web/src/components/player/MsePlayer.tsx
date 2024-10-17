@@ -502,7 +502,7 @@ function MSEPlayer({
 
     const listener = () => {
       if (document.hidden) {
-        onDisconnect();
+        // onDisconnect();
       } else if (videoRef.current?.isConnected) {
         onConnect();
       }
