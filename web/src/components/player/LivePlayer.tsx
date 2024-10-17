@@ -67,8 +67,9 @@ export default function LivePlayer({
   const { activeMotion, activeTracking, objects, offline } =
     useCameraActivity(cameraConfig);
 
+  const LOCAL_AUDIO_KEY = `${cameraConfig.name}_audio`;
   const [localAudio, setLocalAudio] = useLocalStorage(
-    `${cameraConfig.name}_audio`,
+    LOCAL_AUDIO_KEY,
     playAudio,
   );
 
@@ -95,15 +96,15 @@ export default function LivePlayer({
   // Hack to mitigate browser not allowing audio to autoplay
   // Reloads the audio on browser interaction
   // YouTube doesn't have to do this bullshit because it's whitelisted :^)
-  const [didTryAudioReset, setDidTryAudioReset] = useState(false);
   useEffect(() => {
     const listener = () => {
-      if (!didTryAudioReset) {
+      setTimeout(() => {
         const v = localAudio;
         setLocalAudio(!v);
         setTimeout(() => setLocalAudio(v), 1);
-        setDidTryAudioReset(true);
-      }
+      }, 100);
+
+      document.removeEventListener("mousedown", listener);
     };
 
     document.addEventListener("mousedown", listener);
@@ -347,7 +348,6 @@ export default function LivePlayer({
             isActive={audio ?? false}
             title={`${audio ? "Disable" : "Enable"} Camera Audio`}
             onClick={(ev) => {
-              console.log(ev);
               ev?.stopPropagation();
               setLocalAudio(!audio);
             }}
