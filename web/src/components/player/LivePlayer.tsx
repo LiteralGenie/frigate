@@ -10,7 +10,15 @@ import {
 import { getIconForLabel } from "@/utils/iconUtil";
 import { capitalizeFirstLetter } from "@/utils/stringUtil";
 import { TooltipPortal } from "@radix-ui/react-tooltip";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  DetailedHTMLProps,
+  HTMLAttributes,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { GiSpeaker, GiSpeakerOff } from "react-icons/gi";
 import { TbExclamationCircle } from "react-icons/tb";
 import AutoUpdatingCameraImage from "../camera/AutoUpdatingCameraImage";
@@ -26,6 +34,7 @@ type LivePlayerProps = {
   cameraRef?: (ref: HTMLDivElement | null) => void;
   containerRef?: React.MutableRefObject<HTMLDivElement | null>;
   className?: string;
+  style?: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
   cameraConfig: CameraConfig;
   preferredLiveMode: LivePlayerMode;
   showStillWithoutActivity?: boolean;
@@ -46,6 +55,7 @@ export default function LivePlayer({
   cameraRef = undefined,
   containerRef,
   className,
+  style,
   cameraConfig,
   preferredLiveMode,
   showStillWithoutActivity = true,
@@ -259,6 +269,7 @@ export default function LivePlayer({
         className,
       )}
       onClick={onClick}
+      style={style}
     >
       {((showStillWithoutActivity && !liveReady) || liveReady) && (
         <>

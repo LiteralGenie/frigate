@@ -1,8 +1,8 @@
 import { useFrigateReviews } from "@/api/ws";
 import Logo from "@/components/Logo";
+import { AnimatedEventCard } from "@/components/card/AnimatedEventCard";
 import { CameraGroupSelector } from "@/components/filter/CameraGroupSelector";
 import { LiveGridIcon, LiveListIcon } from "@/components/icons/LiveIcons";
-import { AnimatedEventCard } from "@/components/card/AnimatedEventCard";
 import BirdseyeLivePlayer from "@/components/player/BirdseyeLivePlayer";
 import LivePlayer from "@/components/player/LivePlayer";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useResizeObserver } from "@/hooks/resize-observer";
+import useCameraLiveMode from "@/hooks/use-camera-live-mode";
 import { usePersistence } from "@/hooks/use-persistence";
+import { cn } from "@/lib/utils";
 import { CameraConfig, FrigateConfig } from "@/types/frigateConfig";
+import { LivePlayerError } from "@/types/live";
 import { ReviewSegment } from "@/types/review";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -23,15 +27,11 @@ import {
   isMobileOnly,
   isTablet,
 } from "react-device-detect";
-import useSWR from "swr";
-import DraggableGridLayout from "./DraggableGridLayout";
+import { FaCompress, FaExpand } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { cn } from "@/lib/utils";
-import { LivePlayerError } from "@/types/live";
-import { FaCompress, FaExpand } from "react-icons/fa";
-import useCameraLiveMode from "@/hooks/use-camera-live-mode";
-import { useResizeObserver } from "@/hooks/resize-observer";
+import useSWR from "swr";
+import DraggableGridLayout from "./DraggableGridLayout";
 
 type LiveDashboardViewProps = {
   cameras: CameraConfig[];
@@ -342,11 +342,18 @@ export default function LiveDashboardView({
               } else {
                 grow = "aspect-video";
               }
+
+              const style = {} as any;
+              if (mobileLayout === "grid") {
+                style.maxHeight = "calc(50vh - 50px)";
+              }
+
               return (
                 <LivePlayer
                   cameraRef={cameraRef}
                   key={camera.name}
                   className={`${grow} rounded-lg bg-black md:rounded-2xl`}
+                  style={style}
                   windowVisible={
                     windowVisible && visibleCameras.includes(camera.name)
                   }
