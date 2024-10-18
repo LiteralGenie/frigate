@@ -345,7 +345,7 @@ export default function LiveDashboardView({
 
               const style = {} as any;
               if (mobileLayout === "grid") {
-                style.maxHeight = "calc(50vh - 50px)";
+                style.maxHeight = "calc(50svh - 50px)";
               }
 
               return (
