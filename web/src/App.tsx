@@ -1,12 +1,12 @@
-import Providers from "@/context/providers";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Wrapper from "@/components/Wrapper";
 import Sidebar from "@/components/navigation/Sidebar";
+import Providers from "@/context/providers";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import { Suspense, lazy, useEffect, useState } from "react";
 import { isDesktop, isMobile } from "react-device-detect";
 import Statusbar from "./components/Statusbar";
 import Bottombar from "./components/navigation/Bottombar";
-import { Suspense, lazy } from "react";
 import { Redirect } from "./components/navigation/Redirect";
 import { cn } from "./lib/utils";
 import { isPWA } from "./utils/isPWA";
@@ -22,6 +22,20 @@ const UIPlayground = lazy(() => import("@/pages/UIPlayground"));
 const Logs = lazy(() => import("@/pages/Logs"));
 
 function App() {
+  const [isPortrait, setIsPortrait] = useState(false);
+  useEffect(() => {
+    const listener = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener("resize", listener);
+
+    setTimeout(() => listener(), 50);
+
+    setIsPortrait(true);
+
+    return () => window.removeEventListener("resize", listener);
+  }, []);
+
   return (
     <Providers>
       <BrowserRouter basename={window.baseUrl}>
@@ -29,14 +43,15 @@ function App() {
           <div className="size-full overflow-hidden">
             {isDesktop && <Sidebar />}
             {isDesktop && <Statusbar />}
-            {isMobile && <Bottombar />}
+            {isMobile && (isPortrait ? <Bottombar /> : <Sidebar />)}
             <div
               id="pageRoot"
               className={cn(
                 "absolute right-0 top-0 overflow-hidden",
-                isMobile
-                  ? `bottom-${isPWA ? 16 : 12} left-0 md:bottom-16 landscape:bottom-14 landscape:md:bottom-16`
-                  : "bottom-8 left-[52px]",
+                isMobile ? `bottom-${isPWA ? 16 : 12}` : "bottom-8",
+                isMobile && !isPortrait
+                  ? "bottom-0 left-[52px]"
+                  : "bottom-14 left-0 md:bottom-16",
               )}
             >
               <Suspense>

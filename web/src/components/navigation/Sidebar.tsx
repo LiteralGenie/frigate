@@ -1,12 +1,13 @@
-import Logo from "../Logo";
-import NavItem from "./NavItem";
-import { CameraGroupSelector } from "../filter/CameraGroupSelector";
-import { Link, useMatch } from "react-router-dom";
-import GeneralSettings from "../menu/GeneralSettings";
-import AccountSettings from "../menu/AccountSettings";
-import useNavigation from "@/hooks/use-navigation";
 import { baseUrl } from "@/api/baseUrl";
+import useNavigation from "@/hooks/use-navigation";
+import { cn } from "@/lib/utils";
 import { useMemo } from "react";
+import { Link, useMatch } from "react-router-dom";
+import { CameraGroupSelector } from "../filter/CameraGroupSelector";
+import Logo from "../Logo";
+import AccountSettings from "../menu/AccountSettings";
+import GeneralSettings from "../menu/GeneralSettings";
+import NavItem from "./NavItem";
 
 function Sidebar() {
   const basePath = useMemo(() => new URL(baseUrl).pathname, []);
@@ -17,7 +18,11 @@ function Sidebar() {
   const navbarLinks = useNavigation();
 
   return (
-    <aside className="scrollbar-container scrollbar-hidden absolute inset-y-0 left-0 z-10 flex w-[52px] flex-col justify-between overflow-y-auto border-r border-secondary-highlight bg-background_alt py-4">
+    <aside
+      className={cn(
+        "scrollbar-container scrollbar-hidden absolute inset-y-0 left-0 z-10 flex w-[52px] flex-col justify-between overflow-y-auto overflow-x-hidden border-r border-secondary-highlight bg-background_alt py-4",
+      )}
+    >
       <span tabIndex={0} className="sr-only" />
       <div className="flex w-full flex-col items-center gap-0">
         <Link to="/">

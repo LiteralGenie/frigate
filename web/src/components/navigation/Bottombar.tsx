@@ -1,22 +1,22 @@
-import NavItem from "./NavItem";
-import { IoIosWarning } from "react-icons/io";
-import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
-import useSWR from "swr";
-import { FrigateStats } from "@/types/stats";
 import { useFrigateStats } from "@/api/ws";
-import { useContext, useEffect, useMemo } from "react";
-import useStats from "@/hooks/use-stats";
-import GeneralSettings from "../menu/GeneralSettings";
-import AccountSettings from "../menu/AccountSettings";
-import useNavigation from "@/hooks/use-navigation";
 import {
   StatusBarMessagesContext,
   StatusMessage,
 } from "@/context/statusbar-provider";
-import { Link } from "react-router-dom";
+import useNavigation from "@/hooks/use-navigation";
+import useStats from "@/hooks/use-stats";
 import { cn } from "@/lib/utils";
-import { isIOS, isMobile } from "react-device-detect";
+import { FrigateStats } from "@/types/stats";
 import { isPWA } from "@/utils/isPWA";
+import { useContext, useEffect, useMemo } from "react";
+import { isIOS, isMobile } from "react-device-detect";
+import { IoIosWarning } from "react-icons/io";
+import { Link } from "react-router-dom";
+import useSWR from "swr";
+import AccountSettings from "../menu/AccountSettings";
+import GeneralSettings from "../menu/GeneralSettings";
+import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
+import NavItem from "./NavItem";
 
 function Bottombar() {
   const navItems = useNavigation("secondary");

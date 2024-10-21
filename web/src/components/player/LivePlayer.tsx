@@ -351,7 +351,7 @@ export default function LivePlayer({
       )}
 
       <div className="absolute right-2 top-2">
-        {!overrideLocalAudio && (
+        {!overrideLocalAudio && !offline && (
           <CameraFeatureToggle
             className="p-2 md:p-0"
             variant="ghost"

@@ -1,7 +1,6 @@
 import { useFrigateReviews } from "@/api/ws";
 import Logo from "@/components/Logo";
 import { AnimatedEventCard } from "@/components/card/AnimatedEventCard";
-import { CameraGroupSelector } from "@/components/filter/CameraGroupSelector";
 import { LiveGridIcon, LiveListIcon } from "@/components/icons/LiveIcons";
 import BirdseyeLivePlayer from "@/components/player/BirdseyeLivePlayer";
 import LivePlayer from "@/components/player/LivePlayer";
@@ -223,15 +222,13 @@ export default function LiveDashboardView({
 
   return (
     <div
-      className="scrollbar-container size-full overflow-y-auto px-1 pt-2 md:p-2"
+      className="scrollbar-container size-full overflow-y-auto px-1 pt-2"
       ref={containerRef}
     >
       {isMobile && (
         <div className="relative flex h-11 items-center justify-between">
           <Logo className="absolute inset-x-1/2 h-8 -translate-x-1/2" />
-          <div className="max-w-[45%]">
-            <CameraGroupSelector />
-          </div>
+          <div className="max-w-[45%]">{/* <CameraGroupSelector /> */}</div>
           {(!cameraGroup || cameraGroup == "default" || isMobileOnly) && (
             <div className="flex items-center gap-1">
               <Button
@@ -303,11 +300,12 @@ export default function LiveDashboardView({
         <>
           <div
             className={cn(
-              "mt-2 grid grid-cols-1 gap-2 px-2 md:gap-4",
+              "mt-2 grid grid-cols-1 gap-2 px-2",
               mobileLayout == "grid" &&
-                "grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4",
+                "h-min-[90svh] grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4",
               isMobile && "px-0",
             )}
+            style={{ minHeight: isMobile ? "90vmin" : "" }}
           >
             {includeBirdseye && birdseyeConfig?.enabled && (
               <div
@@ -345,7 +343,7 @@ export default function LiveDashboardView({
 
               const style = {} as any;
               if (mobileLayout === "grid") {
-                style.maxHeight = "calc(50svh - 50px)";
+                style.maxHeight = "calc(50svh - 10px)";
               }
 
               return (

@@ -1,16 +1,3 @@
-import { CameraGroupConfig, FrigateConfig } from "@/types/frigateConfig";
-import { isDesktop, isMobile } from "react-device-detect";
-import useSWR from "swr";
-import { MdHome } from "react-icons/md";
-import { usePersistedOverlayState } from "@/hooks/use-overlay-state";
-import { Button } from "../ui/button";
-import { useCallback, useMemo, useState } from "react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { LuPencil, LuPlus } from "react-icons/lu";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import { Drawer, DrawerContent } from "../ui/drawer";
-import { Input } from "../ui/input";
-import { Separator } from "../ui/separator";
 import {
   Form,
   FormControl,
@@ -20,12 +7,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { Toaster } from "@/components/ui/sonner";
+import { usePersistedOverlayState } from "@/hooks/use-overlay-state";
+import { usePersistence } from "@/hooks/use-persistence";
+import { cn } from "@/lib/utils";
+import { CameraGroupConfig, FrigateConfig } from "@/types/frigateConfig";
+import { isValidIconName } from "@/utils/iconUtil";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { TooltipPortal } from "@radix-ui/react-tooltip";
+import axios from "axios";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { isDesktop, isMobile } from "react-device-detect";
+import { useForm } from "react-hook-form";
+import { HiOutlineDotsVertical, HiTrash } from "react-icons/hi";
+import * as LuIcons from "react-icons/lu";
+import { LuPencil, LuPlus } from "react-icons/lu";
+import { MdHome } from "react-icons/md";
+import { toast } from "sonner";
+import useSWR from "swr";
+import { z } from "zod";
+import IconPicker, { IconName, IconRenderer } from "../icons/IconPicker";
+import ActivityIndicator from "../indicators/activity-indicator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,23 +38,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
-import axios from "axios";
-import FilterSwitch from "./FilterSwitch";
-import { HiOutlineDotsVertical, HiTrash } from "react-icons/hi";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { Drawer, DrawerContent } from "../ui/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import IconWrapper from "../ui/icon-wrapper";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
-import ActivityIndicator from "../indicators/activity-indicator";
+import { Input } from "../ui/input";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { usePersistence } from "@/hooks/use-persistence";
-import { TooltipPortal } from "@radix-ui/react-tooltip";
-import { cn } from "@/lib/utils";
-import * as LuIcons from "react-icons/lu";
-import IconPicker, { IconName, IconRenderer } from "../icons/IconPicker";
-import { isValidIconName } from "@/utils/iconUtil";
+import { Separator } from "../ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import FilterSwitch from "./FilterSwitch";
 
 type CameraGroupSelectorProps = {
   className?: string;
@@ -102,6 +102,20 @@ export function CameraGroupSelector({ className }: CameraGroupSelectorProps) {
 
   const Scroller = isMobile ? ScrollArea : "div";
 
+  const [isPortrait, setIsPortrait] = useState(false);
+  useEffect(() => {
+    const listener = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener("resize", listener);
+
+    setTimeout(() => listener(), 50);
+
+    setIsPortrait(true);
+
+    return () => window.removeEventListener("resize", listener);
+  }, []);
+
   return (
     <>
       <NewGroupDialog
@@ -117,7 +131,7 @@ export function CameraGroupSelector({ className }: CameraGroupSelectorProps) {
           className={cn(
             "flex items-center justify-start gap-2",
             className,
-            isDesktop ? "flex-col" : "whitespace-nowrap",
+            isDesktop || !isPortrait ? "flex-col" : "whitespace-nowrap",
           )}
         >
           <Tooltip open={tooltip == "default"}>
