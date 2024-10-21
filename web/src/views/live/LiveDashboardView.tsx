@@ -51,10 +51,23 @@ export default function LiveDashboardView({
   const { data: config } = useSWR<FrigateConfig>("config");
 
   // layout
+  const [isPortrait, setIsPortrait] = useState(false);
+  useEffect(() => {
+    const listener = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener("resize", listener);
+
+    setTimeout(() => listener(), 50);
+
+    setIsPortrait(true);
+
+    return () => window.removeEventListener("resize", listener);
+  }, []);
 
   const [mobileLayout, setMobileLayout] = usePersistence<"grid" | "list">(
     "live-layout",
-    "grid",
+    isMobile && isPortrait ? "grid" : "list",
   );
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
