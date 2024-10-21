@@ -49,9 +49,8 @@ function App() {
               className={cn(
                 "absolute right-0 top-0 overflow-hidden",
                 isMobile ? `bottom-${isPWA ? 16 : 12}` : "bottom-8",
-                isMobile && !isPortrait
-                  ? "bottom-0 left-[52px]"
-                  : "bottom-14 left-0 md:bottom-16",
+                isMobile && !isPortrait ? "bottom-0" : "bottom-14 md:bottom-16",
+                !isMobile || !isPortrait ? "left-[52px]" : "left-0",
               )}
             >
               <Suspense>
