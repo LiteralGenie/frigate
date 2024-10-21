@@ -54,7 +54,7 @@ export default function LiveDashboardView({
 
   const [mobileLayout, setMobileLayout] = usePersistence<"grid" | "list">(
     "live-layout",
-    isDesktop ? "grid" : "list",
+    "grid",
   );
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
