@@ -262,7 +262,7 @@ export default function LiveCameraView({
 
   // playback state
 
-  const [audio, setAudio] = useSessionPersistence("liveAudio", false);
+  const [audio, setAudio] = useSessionPersistence("liveAudio", true);
   const [mic, setMic] = useState(false);
   const [webRTC, setWebRTC] = useState(false);
   const [pip, setPip] = useState(false);
@@ -660,6 +660,7 @@ export default function LiveCameraView({
                   containerRef={containerRef}
                   setFullResolution={setFullResolution}
                   onError={handleError}
+                  overrideLocalAudio={true}
                 />
               </div>
             </TransformComponent>

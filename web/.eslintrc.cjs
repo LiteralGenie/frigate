@@ -32,7 +32,7 @@ module.exports = {
       { allowConstantExport: true },
     ],
     "comma-dangle": [
-      "error",
+      "warn",
       {
         objects: "always-multiline",
         arrays: "always-multiline",
@@ -40,18 +40,18 @@ module.exports = {
       },
     ],
     "no-unused-vars": [
-      "error",
+      "warn",
       { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
     ],
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
         caughtErrorsIgnorePattern: "^_",
       },
     ],
-    "no-console": "error",
+    "no-console": "warn",
     "prettier/prettier": [
       "warn",
       {

@@ -27,6 +27,9 @@ import { useCameraFriendlyName } from "@/hooks/use-camera-friendly-name";
 import { ImageShadowOverlay } from "../overlay/ImageShadowOverlay";
 import { getTranslatedLabel } from "@/utils/i18n";
 import { formatList } from "@/utils/stringUtil";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import CameraFeatureToggle from "../dynamic/CameraFeatureToggle";
+import { GiSpeaker, GiSpeakerOff } from "react-icons/gi";
 
 type LivePlayerProps = {
   cameraRef?: (ref: HTMLDivElement | null) => void;
@@ -51,6 +54,9 @@ type LivePlayerProps = {
   setFullResolution?: React.Dispatch<React.SetStateAction<VideoResolutionType>>;
   onError?: (error: LivePlayerError) => void;
   onResetLiveMode?: () => void;
+  // 
+  style?: any;
+  overrideLocalAudio?: boolean;
 };
 
 export default function LivePlayer({
@@ -64,7 +70,7 @@ export default function LivePlayer({
   alwaysShowCameraName = false,
   useWebGL = false,
   windowVisible = true,
-  playAudio = false,
+  playAudio = true,
   volume,
   playInBackground = false,
   micEnabled = false,
@@ -76,10 +82,14 @@ export default function LivePlayer({
   setFullResolution,
   onError,
   onResetLiveMode,
+  // 
+  style,
+  overrideLocalAudio
 }: LivePlayerProps) {
   const { t } = useTranslation(["components/player"]);
 
   const internalContainerRef = useRef<HTMLDivElement | null>(null);
+  const audioToggleEl = useRef<HTMLDivElement | null>(null);
 
   const cameraName = useCameraFriendlyName(cameraConfig);
   // stats
@@ -104,12 +114,42 @@ export default function LivePlayer({
     offline,
   } = useCameraActivity(cameraConfig);
 
-  const cameraActive = useMemo(
-    () =>
-      !showStillWithoutActivity ||
-      (windowVisible && (activeMotion || activeTracking)),
-    [activeMotion, activeTracking, showStillWithoutActivity, windowVisible],
+
+  const LOCAL_AUDIO_KEY = `${cameraConfig.name}_audio`;
+  const [localAudio, setLocalAudio] = useLocalStorage(
+    LOCAL_AUDIO_KEY,
+    playAudio,
   );
+  const audio = useMemo(
+    () => (overrideLocalAudio ? playAudio : localAudio),
+    [overrideLocalAudio, playAudio, localAudio],
+  );
+  // Hack to mitigate browser not allowing audio to autoplay
+  // Reloads the audio on browser interaction
+  // YouTube doesn't have to do this bullshit because it's whitelisted :^)
+  useEffect(() => {
+    const listener = (ev: MouseEvent) => {
+      setTimeout(() => {
+        const v = (audioToggleEl.current?.contains(ev.target as any)) ? !localAudio : !!localAudio;
+        setLocalAudio(!v);
+        setTimeout(() => setLocalAudio(v), 1);
+      }, 100);
+
+      document.removeEventListener("mousedown", listener);
+    };
+
+    document.addEventListener("mousedown", listener);
+
+    return () => document.removeEventListener("mousedown", listener);
+  }, []);
+
+  // const cameraActive = useMemo(
+  //   () =>
+  //     !showStillWithoutActivity ||
+  //     (windowVisible && (activeMotion || activeTracking)),
+  //   [activeMotion, activeTracking, showStillWithoutActivity, windowVisible],
+  // );
+  const cameraActive = true;
 
   // camera live state
 
@@ -250,7 +290,7 @@ export default function LivePlayer({
         playbackEnabled={cameraActive || liveReady}
         getStats={showStats}
         setStats={setStats}
-        audioEnabled={playAudio}
+        audioEnabled={audio}
         volume={volume}
         microphoneEnabled={micEnabled}
         iOSCompatFullScreen={iOSCompatFullScreen}
@@ -267,7 +307,7 @@ export default function LivePlayer({
           className={`size-full rounded-lg md:rounded-2xl ${liveReady ? "" : "hidden"}`}
           camera={streamName}
           playbackEnabled={cameraActive || liveReady}
-          audioEnabled={playAudio}
+          audioEnabled={audio}
           volume={volume}
           playInBackground={playInBackground}
           getStats={showStats}
@@ -329,6 +369,7 @@ export default function LivePlayer({
           window.open(`${baseUrl}#${cameraConfig.name}`, "_blank")?.focus();
         }
       }}
+      style={style}
     >
       {cameraEnabled &&
         ((showStillWithoutActivity && !liveReady) || liveReady) && (
@@ -446,7 +487,22 @@ export default function LivePlayer({
         </div>
       )}
 
-      <div className="absolute right-2 top-2 flex items-center gap-3">
+      <div 
+      ref={audioToggleEl}
+      className="absolute right-2 top-2 flex items-center gap-3">
+        {!overrideLocalAudio && !offline && (
+          <CameraFeatureToggle
+            className="p-2 md:p-0"
+            variant="ghost"
+            Icon={audio ? GiSpeaker : GiSpeakerOff}
+            isActive={audio ?? false}
+            title={`${audio ? "Disable" : "Enable"} Camera Audio`}
+            onClick={(ev) => {
+              ev?.stopPropagation();
+              setLocalAudio(!audio);
+            }}
+          />
+        )}
         {(alwaysShowCameraName ||
           (offline && showStillWithoutActivity) ||
           !cameraEnabled) && (
@@ -456,12 +512,12 @@ export default function LivePlayer({
             {cameraName}
           </Chip>
         )}
-        {autoLive &&
+        {/* {autoLive &&
           !offline &&
           activeMotion &&
           ((showStillWithoutActivity && !liveReady) || liveReady) && (
             <MdCircle className="mr-2 size-2 animate-pulse text-danger shadow-danger drop-shadow-md" />
-          )}
+          )} */}
       </div>
       {showStats && (
         <PlayerStats stats={stats} minimal={cameraRef !== undefined} />

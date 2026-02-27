@@ -1,12 +1,13 @@
-import { IconType } from "react-icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { isDesktop } from "react-device-detect";
 import { cn } from "@/lib/utils";
 import ActivityIndicator from "../indicators/activity-indicator";
+import { MouseEvent } from "react";
+import { isDesktop } from "react-device-detect";
+import { IconType } from "react-icons";
 
 const variants = {
   primary: {
@@ -22,15 +23,26 @@ const variants = {
     disabled:
       "bg-gradient-to-br from-gray-400 to-gray-500 bg-gray-500 rounded-full cursor-not-allowed opacity-50",
   },
+  ghost: {
+    active: "font-bold text-white rounded-lg",
+    activeStyle: {
+      backgroundColor: "hsl(var(--selected) / 50%)",
+    },
+    inactive: "text-secondary-foreground rounded-lg",
+    inactiveStyle: {
+      backgroundColor: "hsl(var(--secondary) / 30%)",
+    },
+    disabled: ""
+  },
 };
 
 type CameraFeatureToggleProps = {
   className?: string;
-  variant?: "primary" | "overlay";
+  variant?: "primary" | "overlay" | "ghost";
   isActive: boolean;
   Icon: IconType;
   title: string;
-  onClick?: () => void;
+  onClick?: (ev?: MouseEvent) => void;
   disabled?: boolean;
   loading?: boolean;
 };
@@ -55,6 +67,13 @@ export default function CameraFeatureToggle({
           : variants[variant][isActive ? "active" : "inactive"],
         className,
       )}
+      style={
+        variant === "ghost"
+          ? isActive
+            ? variants["ghost"]["activeStyle"]
+            : variants["ghost"]["inactiveStyle"]
+          : {}
+      }
     >
       {loading ? (
         <ActivityIndicator className="size-5 md:m-[6px]" />

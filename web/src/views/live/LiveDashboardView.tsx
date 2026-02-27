@@ -55,6 +55,7 @@ import { EmptyCard } from "@/components/card/EmptyCard";
 import { BsFillCameraVideoOffFill } from "react-icons/bs";
 import { AuthContext } from "@/context/auth-context";
 import { useIsAdmin } from "@/hooks/use-is-admin";
+import { useOrientation } from "@/hooks/use-orientation";
 
 type LiveDashboardViewProps = {
   cameras: CameraConfig[];
@@ -77,10 +78,10 @@ export default function LiveDashboardView({
   const { data: config } = useSWR<FrigateConfig>("config");
 
   // layout
-
+  const {isPortrait} = useOrientation()
   const [mobileLayout, setMobileLayout] = useUserPersistence<"grid" | "list">(
     "live-layout",
-    isDesktop ? "grid" : "list",
+    isMobile && isPortrait ? "list" : "grid",
   );
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -392,9 +393,9 @@ export default function LiveDashboardView({
     >
       {isMobile && (
         <div className="relative flex h-11 items-center justify-between">
-          <Logo className="absolute inset-x-1/2 h-8 -translate-x-1/2" />
+          {/* <Logo className="absolute inset-x-1/2 h-8 -translate-x-1/2" /> */}
           <div className="max-w-[45%]">
-            <CameraGroupSelector />
+            {/* <CameraGroupSelector /> */}
           </div>
           {(!cameraGroup || cameraGroup == "default" || isMobileOnly) && (
             <div className="flex items-center gap-1">
@@ -474,11 +475,12 @@ export default function LiveDashboardView({
             <>
               <div
                 className={cn(
-                  "mt-2 grid grid-cols-1 gap-2 px-2 md:gap-4",
+                  "mt-2 grid grid-cols-1 gap-2 px-2",
                   mobileLayout == "grid" &&
-                    "grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4",
+                    "h-min-[90svh] grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4",
                   isMobile && "px-0",
                 )}
+                style={{ minHeight: isMobile ? "90vmin" : "" }}
               >
                 {includeBirdseye && birdseyeConfig?.enabled && (
                   <div

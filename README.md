@@ -1,3 +1,12 @@
+Fork of https://github.com/blakeblackshear/frigate
+
+Changes:
+
+- Allow player audio on dashboard
+- Disable player pausing when tabbing away
+
+---
+
 <p align="center">
   <img align="center" alt="logo" src="docs/static/img/branding/frigate.png">
 </p>

@@ -79,6 +79,7 @@ import { CameraNameLabel } from "../camera/FriendlyNameLabel";
 import { useAllowedCameras } from "@/hooks/use-allowed-cameras";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useUserPersistedOverlayState } from "@/hooks/use-overlay-state";
+import { useOrientation } from "@/hooks/use-orientation";
 
 type CameraGroupSelectorProps = {
   className?: string;
@@ -144,6 +145,8 @@ export function CameraGroupSelector({ className }: CameraGroupSelectorProps) {
 
   const Scroller = isMobile ? ScrollArea : "div";
 
+  const {isPortrait} = useOrientation();
+
   return (
     <>
       <NewGroupDialog
@@ -160,7 +163,7 @@ export function CameraGroupSelector({ className }: CameraGroupSelectorProps) {
           className={cn(
             "flex items-center justify-start gap-2",
             className,
-            isDesktop ? "flex-col" : "whitespace-nowrap",
+            isDesktop || !isPortrait ? "flex-col" : "whitespace-nowrap",
           )}
         >
           <Tooltip open={tooltip == "default"}>

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Wrapper from "@/components/Wrapper";
 import Sidebar from "@/components/navigation/Sidebar";
 
+import { useOrientation } from "@/hooks/use-orientation";
 import { isDesktop, isMobile } from "react-device-detect";
 import Statusbar from "./components/Statusbar";
 import Bottombar from "./components/navigation/Bottombar";
@@ -69,6 +70,8 @@ function DefaultAppView() {
     );
   }
 
+  const {isPortrait} = useOrientation()
+
   return (
     <div className="size-full overflow-hidden">
       {isDesktop && <Sidebar />}
@@ -78,9 +81,9 @@ function DefaultAppView() {
         id="pageRoot"
         className={cn(
           "absolute right-0 top-0 overflow-hidden",
-          isMobile
-            ? `bottom-${isPWA ? 16 : 12} left-0 md:bottom-16 landscape:bottom-14 landscape:md:bottom-16`
-            : "bottom-8 left-[52px]",
+          isMobile ? `bottom-${isPWA ? 16 : 12}` : "bottom-8",
+          isMobile && !isPortrait ? "bottom-0" : "bottom-14 md:bottom-16",
+          !isMobile || !isPortrait ? "left-[52px]" : "left-0",
         )}
       >
         <Suspense>
