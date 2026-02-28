@@ -457,7 +457,7 @@ export default function LivePlayer({
         />
       </div>
 
-      {offline && !showStillWithoutActivity && cameraEnabled && (
+      {!liveReady && offline && !showStillWithoutActivity && cameraEnabled && (
         <div className="absolute inset-0 left-1/2 top-1/2 flex h-96 w-96 -translate-x-1/2 -translate-y-1/2">
           <div className="flex flex-col items-center justify-center rounded-lg bg-background/50 p-5">
             <p className="my-5 text-lg">{t("streamOffline.title")}</p>
@@ -489,10 +489,16 @@ export default function LivePlayer({
 
       <div 
       ref={audioToggleEl}
-      className="absolute right-2 top-2 flex items-center gap-3">
+      className="absolute right-2 top-2 flex items-center gap-3"
+      // style={setFullResolution ? { top: "20%" } : {}}
+      >
         {!overrideLocalAudio && !offline && (
           <CameraFeatureToggle
             className="p-2 md:p-0"
+            // iconStyle={setFullResolution ? {
+            //   height: '10vw',
+            //   width: '10vw',
+            // } : {}}
             variant="ghost"
             Icon={audio ? GiSpeaker : GiSpeakerOff}
             isActive={audio ?? false}

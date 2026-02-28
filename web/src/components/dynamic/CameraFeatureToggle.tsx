@@ -45,6 +45,7 @@ type CameraFeatureToggleProps = {
   onClick?: (ev?: MouseEvent) => void;
   disabled?: boolean;
   loading?: boolean;
+  iconStyle?: any;
 };
 
 export default function CameraFeatureToggle({
@@ -56,6 +57,7 @@ export default function CameraFeatureToggle({
   onClick,
   disabled = false,
   loading = false,
+  iconStyle,
 }: CameraFeatureToggleProps) {
   const content = (
     <div
@@ -87,6 +89,7 @@ export default function CameraFeatureToggle({
                 ? "text-white"
                 : "text-secondary-foreground",
           )}
+          style={iconStyle ?? {}}
         />
       )}
     </div>

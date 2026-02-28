@@ -290,6 +290,8 @@ export default function LiveCameraView({
   });
 
   const preferredLiveMode = useMemo(() => {
+    return "mse";
+
     if (mic) {
       return "webrtc";
     }
@@ -418,6 +420,7 @@ export default function LiveCameraView({
     return () => screenOrientation.unlock();
   }, [fullscreen, cameraAspectRatio]);
 
+  let [key, setKey] = useState(0)
   const handleError = useCallback(
     (e: LivePlayerError) => {
       if (e) {
@@ -426,14 +429,16 @@ export default function LiveCameraView({
           config &&
           config.go2rtc?.webrtc?.candidates?.length > 0
         ) {
-          setWebRTC(true);
+          // setWebRTC(true);
         } else {
-          setWebRTC(false);
-          setLowBandwidth(true);
+          // setWebRTC(false);
+          // setLowBandwidth(true);
+          
+          setKey(key+1)
         }
       }
     },
-    [config, webRTC],
+    [config, webRTC, key],
   );
 
   return (
@@ -641,8 +646,9 @@ export default function LiveCameraView({
                   aspectRatio: constrainedAspectRatio,
                 }}
               >
+                {/* <span>{key}</span> */}
                 <LivePlayer
-                  key={camera.name}
+                  key={camera.name + "_" + String(key)}
                   className={`${fullscreen ? "*:rounded-none" : ""}`}
                   windowVisible
                   showStillWithoutActivity={false}
