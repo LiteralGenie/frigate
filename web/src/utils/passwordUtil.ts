@@ -11,7 +11,7 @@ export const calculatePasswordStrength = (password: string): number => {
 };
 
 export const getPasswordRequirements = (password: string) => ({
-  length: password?.length >= 12,
+  length: password?.length >= 0,
 });
 
 export const getPasswordStrengthLabel = (

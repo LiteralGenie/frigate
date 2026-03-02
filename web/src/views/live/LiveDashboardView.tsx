@@ -78,7 +78,7 @@ export default function LiveDashboardView({
   const { data: config } = useSWR<FrigateConfig>("config");
 
   // layout
-  const {isPortrait} = useOrientation()
+  const { isPortrait } = useOrientation();
   const [mobileLayout, setMobileLayout] = useUserPersistence<"grid" | "list">(
     "live-layout",
     isMobile && isPortrait ? "list" : "grid",
@@ -119,6 +119,43 @@ export default function LiveDashboardView({
       cameras: alertCameras,
     },
   ]);
+
+  // const gridContainerClasses = []
+  // const gridClasses = ["mt-2", "grid", "grid-cols-1", "gap-2", "px-2"];
+  // const gridStyles = {} as any
+  // if (mobileLayout === "grid") {
+  //   gridClasses.push(
+  //     "h-min-[90svh]",
+  //     "grid-cols-2",
+  //     "xl:grid-cols-3",
+  //     "3xl:grid-cols-4",
+  //   );
+  // }
+  // if (isMobile) {
+  //   gridClasses.push("px-0")
+  //   gridStyles.minHeight = "90vmin"
+  // }
+
+  const gridContainerClasses = [
+    "flex",
+    "items-center",
+    "justify-start",
+    "flex-col",
+  ];
+  const gridClasses = ["gap-2", "grid", "mt-2", "px-2"];
+  const numRows = Math.ceil(Math.sqrt(cameras.length));
+  const gridStyles = {
+    gridTemplateColumns: `repeat(${numRows}, minmax(0, 1fr))`,
+    gridTemplateRows: `repeat(${numRows}, minmax(0, 1fr))`,
+    height: "calc(100vh - 8rem)",
+  };
+  if (mobileLayout === "list") {
+    gridStyles.gridTemplateColumns = `repeat(1, minmax(0, 1fr))`;
+    gridStyles.gridTemplateRows = `repeat(auto-fit, minmax(0, 1fr))`;
+  }
+  if (isMobile) {
+    gridClasses.push("px-0");
+  }
 
   useEffect(() => {
     if (!eventUpdate) {
@@ -388,15 +425,16 @@ export default function LiveDashboardView({
 
   return (
     <div
-      className="scrollbar-container size-full select-none overflow-y-auto px-1 pt-2 md:p-2"
+      className={cn(
+        "scrollbar-container size-full select-none overflow-y-auto px-1 pt-2 md:p-2",
+        ...gridContainerClasses,
+      )}
       ref={containerRef}
     >
       {isMobile && (
-        <div className="relative flex h-11 items-center justify-between">
+        <div className="relative flex h-11 w-full items-center justify-between">
           {/* <Logo className="absolute inset-x-1/2 h-8 -translate-x-1/2" /> */}
-          <div className="max-w-[45%]">
-            {/* <CameraGroupSelector /> */}
-          </div>
+          <div className="max-w-[45%]">{/* <CameraGroupSelector /> */}</div>
           {(!cameraGroup || cameraGroup == "default" || isMobileOnly) && (
             <div className="flex items-center gap-1">
               <Button
@@ -473,15 +511,7 @@ export default function LiveDashboardView({
 
           {!cameraGroup || cameraGroup == "default" || isMobileOnly ? (
             <>
-              <div
-                className={cn(
-                  "mt-2 grid grid-cols-1 gap-2 px-2",
-                  mobileLayout == "grid" &&
-                    "h-min-[90svh] grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4",
-                  isMobile && "px-0",
-                )}
-                style={{ minHeight: isMobile ? "90vmin" : "" }}
-              >
+              <div className={cn(gridClasses)} style={gridStyles}>
                 {includeBirdseye && birdseyeConfig?.enabled && (
                   <div
                     className={(() => {

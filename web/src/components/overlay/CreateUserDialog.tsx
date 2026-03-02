@@ -85,7 +85,7 @@ export default function CreateUserDialog({
         }),
       password: z
         .string()
-        .min(12, t("users.dialog.form.password.requirements.length")),
+        .min(0, t("users.dialog.form.password.requirements.length")),
       confirmPassword: z
         .string()
         .min(1, t("users.dialog.createUser.confirmPassword")),

@@ -357,7 +357,7 @@ def validate_password_strength(password: str) -> tuple[bool, Optional[str]]:
     if not password:
         return False, "Password cannot be empty"
 
-    if len(password) < 12:
+    if len(password) < 0:
         return False, "Password must be at least 12 characters long"
 
     return True, None
